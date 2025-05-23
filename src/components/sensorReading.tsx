@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { CiWarning } from "react-icons/ci";
+import { FaCheckCircle } from "react-icons/fa";
 interface SensorData {
   id: number;
   timestamp: string;
@@ -75,7 +77,7 @@ export default function SensorReading({generateData}:Data) {
                 <div className="flex-1 flex flex-col justify-center items-center">
                   <div className="relative w-32 h-32 mb-4">
                     <div className="absolute inset-0 rounded-full border-4 border-gray-100 flex items-center justify-center">
-                      <span className="text-4xl font-bold">
+                      <span className="text-4xl font-bold text-[#000]">
                         {fuelStatus.value}%
                       </span>
                     </div>
@@ -128,7 +130,7 @@ export default function SensorReading({generateData}:Data) {
                 <div className="flex-1 flex flex-col justify-center items-center">
                   <div className="relative w-32 h-32 mb-4">
                     <div className="absolute inset-0 rounded-full border-4 border-gray-100 flex items-center justify-center">
-                      <span className="text-4xl font-bold">
+                      <span className="text-4xl font-bold text-[#000]">
                         {brakeStatus.value}%
                       </span>
                     </div>
@@ -181,9 +183,9 @@ export default function SensorReading({generateData}:Data) {
                 <div className="flex-1 flex flex-col justify-center items-center">
                   <div className="text-6xl mb-4">
                     {seatbeltStatus.status === "OK" ? (
-                      <i className="fas fa-check-circle text-[#00C851]"></i>
+                      <FaCheckCircle  className="text-[#00C851] text-[80px]" />
                     ) : (
-                      <i className="fas fa-exclamation-triangle text-[#ff4444]"></i>
+                      <CiWarning className="text-[#ff4444] text-[80px]"/>
                     )}
                   </div>
                   <div className="text-center">
@@ -214,10 +216,10 @@ export default function SensorReading({generateData}:Data) {
                 <div className="flex-1 flex flex-col justify-center items-center">
                   <div className="relative w-32 h-32 mb-4">
                     <div className="absolute inset-0 rounded-full border-4 border-gray-100 flex items-center justify-center">
-                      <span className="text-4xl font-bold">
+                      <span className="text-4xl font-bold text-[#000]">
                         {tirePressureStatus.value}
                       </span>
-                      <span className="text-sm ml-1">PSI</span>
+                      <span className="text-sm ml-1 text-[#000]">PSI</span>
                     </div>
                     <svg
                       className="absolute inset-0"

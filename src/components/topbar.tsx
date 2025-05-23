@@ -1,4 +1,5 @@
 "use client"
+import { BiCar } from "react-icons/bi";
 import { useState, useEffect } from "react";
 interface SensorData {
   id: number;
@@ -28,8 +29,8 @@ export default function Topbar({generateData}:Data) {
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-2">
             <i className="fas fa-car-alt text-3xl text-blue-600"></i>
-            <h1 className="text-2xl font-bold text-gray-800">
-              Sensor Readings
+            <h1 className="text-base font-bold text-gray-800 flex flex-row items-center gap-[10px] sm:text-2xl ">
+              <BiCar/>Car Maintaines
             </h1>
           </div>
           <div className="flex items-center space-x-4">
