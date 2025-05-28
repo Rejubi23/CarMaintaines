@@ -1,26 +1,54 @@
 import { useState,useEffect } from "react";
 
-interface SensorData {
-  id: number;
-  timestamp: string;
-  component: string;
-  status: "Critical" | "Warning" | "OK";
-  value: number;
-}
+interface DataType{
+  brake: boolean,
+  brakeStatus: string,
+  fuel: number,
+  fuelStatus: string,
+  seatbelt: boolean,
+  seatbeltStatus: string,
+  tire: number,
+  tireStatus: string,
+  }
 
-interface Data{
-  generateData: Function
-}
 
-export default function SystemAlerts({ generateData }: Data) {
-  const [sensorData, setSensorData] = useState<SensorData[]>([]);
-   useEffect(()=>{
-      setSensorData(generateData())
-    }, [])
-  const criticalAlerts = sensorData.filter(
-    (data) => data.status === "Critical",
-  );
-  const warningAlerts = sensorData.filter((data) => data.status === "Warning");
+  
+  interface DataPropType{
+    data: Array<DataType>
+  }
+export default function SystemAlerts({data}:DataPropType) {
+  const [lastData, setLastData] = useState<DataType | undefined>(undefined);
+
+ useEffect(()=>{
+     setLastData(data[data.length - 1])
+     console.log(lastData)
+ },[data])
+
+
+ 
+ const criticalAlerts = lastData
+ ? Object.entries(lastData).filter(([key, value]) => {
+     return (
+       (key === "fuel" && typeof value === "number" && value <= 30) ||
+       (key === "tire" && typeof value === "number" && value <= 30) ||
+       (key === "brake" && value === false) ||
+       (key === "seatbelt" && value === false)
+     );
+   })
+ : [];
+ 
+
+  const warningAlerts = lastData
+  ? Object.entries(lastData).filter(([key, value]) => {
+      return (
+        (key === "fuel" && typeof value === "number" && value > 30 && value <= 60 ) ||
+        (key === "tire" && typeof value === "number" && value > 30 && value <= 60 )
+      );
+    })
+  : [];
+  // console.log(criticalAlerts)
+
+
   const [alertsVisible, setAlertsVisible] = useState(true);
 
   if (!alertsVisible) return null;
@@ -49,22 +77,18 @@ export default function SystemAlerts({ generateData }: Data) {
                           Critical Alerts
                         </h3>
                         <div className="space-y-2">
-                          {criticalAlerts.slice(0, 3).map((alert) => (
+                          {criticalAlerts.map((alert, index) => (
                             <div
-                              key={alert.id}
+                              key={index}
                               className="bg-gray-50 p-3 rounded-md border-l-4 border-[#ff4444] flex justify-between"
                             >
                               <div>
                                 <span className="font-bold text-gray-800">
-                                  {alert.component}
+                                {alert}
                                 </span>
-                                : {alert.value}%
-                                <p className="text-sm text-gray-500">
-                                  {alert.timestamp}
-                                </p>
                               </div>
                               <div className="text-[#ff4444] font-bold">
-                                {alert.status}
+                                {"CRITICAL"}
                               </div>
                             </div>
                           ))}
@@ -78,31 +102,27 @@ export default function SystemAlerts({ generateData }: Data) {
                           Warning Alerts
                         </h3>
                         <div className="space-y-2">
-                          {warningAlerts.slice(0, 3).map((alert) => (
+                          {warningAlerts.map((alert, index) => (
                             <div
-                              key={alert.id}
+                              key={index}
                               className="bg-gray-50 p-3 rounded-md border-l-4 border-[#ffbb33] flex justify-between"
                             >
                               <div>
                                 <span className="font-bold text-gray-800">
-                                  {alert.component}
+                                  {alert}
                                 </span>
-                                : {alert.value}%
-                                <p className="text-sm text-gray-500">
-                                  {alert.timestamp}
-                                </p>
                               </div>
                               <div className="text-[#ffbb33] font-bold">
-                                {alert.status}
+                                {"WARNING"}
                               </div>
                             </div>
                           ))}
                         </div>
                       </div>
                     )}
-                  </div>
-                </div>
-              )}
+                  </div> 
+              </div>
+            )}
     </div>
     );
 }

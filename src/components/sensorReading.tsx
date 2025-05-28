@@ -1,43 +1,32 @@
 import { useState, useEffect } from "react";
 import { CiWarning } from "react-icons/ci";
 import { FaCheckCircle } from "react-icons/fa";
-interface SensorData {
-  id: number;
-  timestamp: string;
-  component: string;
-  status: "Critical" | "Warning" | "OK";
-  value: number;
-}
-interface Data{
-  generateData: Function
-}
-export default function SensorReading({generateData}:Data) { 
-  const [sensorData, setSensorData] = useState<SensorData[]>([]);
-   useEffect(()=>{
-      setSensorData(generateData())
-    }, [])
-  const getSystemStatus = (component: string) => {
-    const latestData = sensorData
-      .filter((data) => data.component === component)
-      .sort(
-        (a, b) =>
-          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
-      )[0];
+interface DataType{
+  brake: boolean,
+  brakeStatus: string,
+  fuel: number,
+  fuelStatus: string,
+  seatbelt: boolean,
+  seatbeltStatus: string,
+  tire: number,
+  tireStatus: string,
+  }
 
-    return latestData || { status: "Unknown", value: 0, timestamp: "" };
-  };
-
-  const fuelStatus = getSystemStatus("Fuel Level");
-  const brakeStatus = getSystemStatus("Brake System");
-  const seatbeltStatus = getSystemStatus("Seatbelt Connection");
-  const tirePressureStatus = getSystemStatus("Tire Pressure");
-
-  // Get status color
+  interface DataPropType{
+    data: Array<DataType>
+  }
+export default function SensorReading({data}:DataPropType) { 
+  const [lastData, setLastData] = useState<DataType | undefined>(undefined);
+useEffect(()=>{
+    setLastData(data[data.length - 1])
+    console.log(lastData)
+},[data])
+console.log(lastData)
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "Critical":
+      case "CRITICAL":
         return "bg-[#ff4444]";
-      case "Warning":
+      case "WARNING":
         return "bg-[#ffbb33]";
       case "OK":
         return "bg-[#00C851]";
@@ -69,16 +58,16 @@ export default function SensorReading({generateData}:Data) {
                     Fuel Level
                   </h3>
                   <span
-                    className={`px-2 py-1 rounded-full text-xs font-bold text-white ${getStatusColor(fuelStatus.status)}`}
+                    className={`px-2 py-1 rounded-full text-xs font-bold text-white ${getStatusColor( lastData?.fuelStatus ?? "Unknown" )}`}
                   >
-                    {fuelStatus.status}
+                    {lastData?.fuelStatus}
                   </span>
                 </div>
                 <div className="flex-1 flex flex-col justify-center items-center">
                   <div className="relative w-32 h-32 mb-4">
                     <div className="absolute inset-0 rounded-full border-4 border-gray-100 flex items-center justify-center">
                       <span className="text-4xl font-bold text-[#000]">
-                        {fuelStatus.value}%
+                        {lastData?.fuel}
                       </span>
                     </div>
                     <svg
@@ -93,14 +82,14 @@ export default function SensorReading({generateData}:Data) {
                         r="60"
                         fill="none"
                         stroke={
-                          fuelStatus.status === "Critical"
+                          lastData?.fuelStatus === "Critical"
                             ? "#ff4444"
-                            : fuelStatus.status === "Warning"
+                            : lastData?.fuelStatus === "Warning"
                               ? "#ffbb33"
                               : "#00C851"
                         }
                         strokeWidth="8"
-                        strokeDasharray={`${(fuelStatus.value / 100) * 377} 377`}
+                        strokeDasharray={`${((lastData?.fuel ?? 0) / 100) * 377} 377`}
                         strokeDashoffset="0"
                         strokeLinecap="round"
                         transform="rotate(-90 64 64)"
@@ -109,64 +98,52 @@ export default function SensorReading({generateData}:Data) {
                   </div>
                   <div className="text-center">
                     <p className="text-sm text-gray-500">
-                      Last updated: {fuelStatus.timestamp}
+                      Last updated: 
                     </p>
                   </div>
                 </div>
               </div>
 
+
+
+
+
+
               {/* Brake System */}
               <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-200 flex flex-col">
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-lg font-bold text-gray-800">
-                    Brake System
+                   Brakes
                   </h3>
                   <span
-                    className={`px-2 py-1 rounded-full text-xs font-bold text-white ${getStatusColor(brakeStatus.status)}`}
+                    className={`px-2 py-1 rounded-full text-xs font-bold text-white ${getStatusColor( lastData?.brakeStatus ?? "Unknown" )}`}
                   >
-                    {brakeStatus.status}
+                    {lastData?.brake === true ?"OK":"CRITICAL"}
                   </span>
                 </div>
                 <div className="flex-1 flex flex-col justify-center items-center">
-                  <div className="relative w-32 h-32 mb-4">
-                    <div className="absolute inset-0 rounded-full border-4 border-gray-100 flex items-center justify-center">
-                      <span className="text-4xl font-bold text-[#000]">
-                        {brakeStatus.value}%
-                      </span>
-                    </div>
-                    <svg
-                      className="absolute inset-0"
-                      width="128"
-                      height="128"
-                      viewBox="0 0 128 128"
-                    >
-                      <circle
-                        cx="64"
-                        cy="64"
-                        r="60"
-                        fill="none"
-                        stroke={
-                          brakeStatus.status === "Critical"
-                            ? "#ff4444"
-                            : brakeStatus.status === "Warning"
-                              ? "#ffbb33"
-                              : "#00C851"
-                        }
-                        strokeWidth="8"
-                        strokeDasharray={`${(brakeStatus.value / 100) * 377} 377`}
-                        strokeDashoffset="0"
-                        strokeLinecap="round"
-                        transform="rotate(-90 64 64)"
-                      />
-                    </svg>
+                  <div className="text-6xl mb-4">
+                    {lastData?.brakeStatus === "OK" ? (
+                      <FaCheckCircle  className="text-[#00C851] text-[80px]" />
+                    ) : (
+                      <CiWarning className="text-[#ff4444] text-[80px]"/>
+                    )}
                   </div>
                   <div className="text-center">
+                    <p className="text-xl font-bold mb-2 text-gray-800">
+                      {lastData?.brakeStatus === "OK"
+                        ? "All Good"
+                        : "Check Brakes"}
+                    </p>
                     <p className="text-sm text-gray-500">
-                      Last updated: {brakeStatus.timestamp}
+                      Last updated: 
                     </p>
                   </div>
                 </div>
               </div>
+
+
+
 
               {/* Seatbelt Connection */}
               <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-200 flex flex-col">
@@ -175,14 +152,14 @@ export default function SensorReading({generateData}:Data) {
                     Seatbelt Connection
                   </h3>
                   <span
-                    className={`px-2 py-1 rounded-full text-xs font-bold text-white ${getStatusColor(seatbeltStatus.status)}`}
+                    className={`px-2 py-1 rounded-full text-xs font-bold text-white ${getStatusColor( lastData?.seatbeltStatus ?? "Unknown" )}`}
                   >
-                    {seatbeltStatus.status}
+                    {lastData?.seatbelt===true?"OK":"CRITICAL"}
                   </span>
                 </div>
                 <div className="flex-1 flex flex-col justify-center items-center">
                   <div className="text-6xl mb-4">
-                    {seatbeltStatus.status === "OK" ? (
+                    {lastData?.seatbeltStatus === "OK" ? (
                       <FaCheckCircle  className="text-[#00C851] text-[80px]" />
                     ) : (
                       <CiWarning className="text-[#ff4444] text-[80px]"/>
@@ -190,12 +167,12 @@ export default function SensorReading({generateData}:Data) {
                   </div>
                   <div className="text-center">
                     <p className="text-xl font-bold mb-2 text-gray-800">
-                      {seatbeltStatus.status === "OK"
-                        ? "Connected"
-                        : "Disconnected"}
+                      {lastData?.seatbeltStatus === "OK"
+                        ? "Fastened"
+                        : "Unfastened"}
                     </p>
                     <p className="text-sm text-gray-500">
-                      Last updated: {seatbeltStatus.timestamp}
+                      Last updated: 
                     </p>
                   </div>
                 </div>
@@ -208,16 +185,16 @@ export default function SensorReading({generateData}:Data) {
                     Tire Pressure
                   </h3>
                   <span
-                    className={`px-2 py-1 rounded-full text-xs font-bold text-white ${getStatusColor(tirePressureStatus.status)}`}
+                    className={`px-2 py-1 rounded-full text-xs font-bold text-white ${getStatusColor( lastData?.tireStatus ?? "Unknown" )}`}
                   >
-                    {tirePressureStatus.status}
+                    {lastData?.tireStatus}
                   </span>
                 </div>
                 <div className="flex-1 flex flex-col justify-center items-center">
                   <div className="relative w-32 h-32 mb-4">
                     <div className="absolute inset-0 rounded-full border-4 border-gray-100 flex items-center justify-center">
                       <span className="text-4xl font-bold text-[#000]">
-                        {tirePressureStatus.value}
+                        {lastData?.tire}
                       </span>
                       <span className="text-sm ml-1 text-[#000]">PSI</span>
                     </div>
@@ -233,14 +210,14 @@ export default function SensorReading({generateData}:Data) {
                         r="60"
                         fill="none"
                         stroke={
-                          tirePressureStatus.status === "Critical"
+                          lastData?.tireStatus === "Critical"
                             ? "#ff4444"
-                            : tirePressureStatus.status === "Warning"
+                            :lastData?.tireStatus === "Warning"
                               ? "#ffbb33"
                               : "#00C851"
                         }
                         strokeWidth="8"
-                        strokeDasharray={`${(tirePressureStatus.value / 40) * 377} 377`}
+                        strokeDasharray={`${((lastData?.tire ?? 0) / 100) * 377} 377`}
                         strokeDashoffset="0"
                         strokeLinecap="round"
                         transform="rotate(-90 64 64)"
@@ -249,7 +226,7 @@ export default function SensorReading({generateData}:Data) {
                   </div>
                   <div className="text-center">
                     <p className="text-sm text-gray-500">
-                      Last updated: {tirePressureStatus.timestamp}
+                      Last updated: 
                     </p>
                   </div>
                 </div>
