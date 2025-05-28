@@ -1,29 +1,45 @@
 "use client"
 import { BiCar } from "react-icons/bi";
 import { useState, useEffect } from "react";
-interface SensorData {
-  id: number;
-  timestamp: string;
-  component: string;
-  status: "Critical" | "Warning" | "OK";
-  value: number;
+interface DataType {
+  brake: boolean,
+  brakeStatus: string,
+  fuel: number,
+  fuelStatus: string,
+  seatbelt: boolean,
+  seatbeltStatus: string,
+  tire: number,
+  tireStatus: string,
 }
-interface Data{
-  generateData: Function
+
+interface DataPropType {
+  data: Array<DataType>
 }
-export default function Topbar({generateData}:Data) { 
+export default function Topbar({ data }: DataPropType) { 
   const [alertsVisible, setAlertsVisible] = useState(true);
-   const [sensorData, setSensorData] = useState<SensorData[]>([]);
+   const [lastData, setLastData] = useState<DataType | undefined>(undefined);
    const [lastCheck, setLastCheck] = useState<string | null>(null);
-   const criticalAlerts = sensorData.filter(
-    (data) => data.status === "Critical",
-  );
-  const warningAlerts = sensorData.filter((data) => data.status === "Warning");
-  useEffect(()=>{
-    setSensorData(generateData())
-    const now = new Date().toLocaleString();
-    setLastCheck(now);
-  }, [])
+   useEffect(() => {
+    setLastData(data[data.length - 1])
+  }, [data])
+  const criticalAlerts = lastData
+ ? Object.entries(lastData).filter(([key, value]) => {
+     return (
+       (key === "fuel" && typeof value === "number" && value <= 30) ||
+       (key === "tire" && typeof value === "number" && value <= 30) ||
+       (key === "brake" && value === false) ||
+       (key === "seatbelt" && value === false)
+     );
+   })
+ : [];
+ const warningAlerts = lastData
+ ? Object.entries(lastData).filter(([key, value]) => {
+     return (
+       (key === "fuel" && typeof value === "number" && value > 30 && value <= 60 ) ||
+       (key === "tire" && typeof value === "number" && value > 30 && value <= 60 )
+     );
+   })
+ : [];
   return(
     <header className="bg-white shadow-md">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
