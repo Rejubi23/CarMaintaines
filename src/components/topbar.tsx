@@ -46,7 +46,7 @@ export default function Topbar({ data }: DataPropType) {
           <div className="flex items-center space-x-2">
             <i className="fas fa-car-alt text-3xl text-blue-600"></i>
             <h1 className="text-base font-bold text-gray-800 flex flex-row items-center gap-[10px] sm:text-2xl ">
-              <BiCar/>Car Maintaines
+              <BiCar/>CarMaintaines
             </h1>
           </div>
           <div className="flex items-center space-x-4">
