@@ -17,9 +17,11 @@ interface DataType{
   }
 export default function SensorReading({data}:DataPropType) { 
   const [lastData, setLastData] = useState<DataType | undefined>(undefined);
+  const [lastCheck, setLastCheck] = useState<string | null>(null);
 useEffect(()=>{
     setLastData(data[data.length - 1])
-    console.log(lastData)
+    const now = new Date().toLocaleString();
+    setLastCheck(now);
 },[data])
 console.log(lastData)
   const getStatusColor = (status: string) => {
@@ -82,9 +84,9 @@ console.log(lastData)
                         r="60"
                         fill="none"
                         stroke={
-                          lastData?.fuelStatus === "Critical"
+                          lastData?.fuelStatus === "CRITICAL"
                             ? "#ff4444"
-                            : lastData?.fuelStatus === "Warning"
+                            : lastData?.fuelStatus === "WARNING"
                               ? "#ffbb33"
                               : "#00C851"
                         }
@@ -98,7 +100,7 @@ console.log(lastData)
                   </div>
                   <div className="text-center">
                     <p className="text-sm text-gray-500">
-                      Last updated: 
+                      Last updated:{lastCheck} 
                     </p>
                   </div>
                 </div>
@@ -136,7 +138,7 @@ console.log(lastData)
                         : "Check Brakes"}
                     </p>
                     <p className="text-sm text-gray-500">
-                      Last updated: 
+                      Last updated: {lastCheck}
                     </p>
                   </div>
                 </div>
@@ -172,7 +174,7 @@ console.log(lastData)
                         : "Unfastened"}
                     </p>
                     <p className="text-sm text-gray-500">
-                      Last updated: 
+                      Last updated:{lastCheck} 
                     </p>
                   </div>
                 </div>
@@ -210,9 +212,9 @@ console.log(lastData)
                         r="60"
                         fill="none"
                         stroke={
-                          lastData?.tireStatus === "Critical"
+                          lastData?.tireStatus === "CRITICAL"
                             ? "#ff4444"
-                            :lastData?.tireStatus === "Warning"
+                            :lastData?.tireStatus === "WARNING"
                               ? "#ffbb33"
                               : "#00C851"
                         }
@@ -226,7 +228,7 @@ console.log(lastData)
                   </div>
                   <div className="text-center">
                     <p className="text-sm text-gray-500">
-                      Last updated: 
+                      Last updated: {lastCheck}
                     </p>
                   </div>
                 </div>

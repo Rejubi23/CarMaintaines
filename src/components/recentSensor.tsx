@@ -79,7 +79,15 @@ export default function RecentSensor({ data }: DataPropType) {
                   {data.name}
                 </td>
                 <td className="py-3 px-4 text-gray-800">
-                  {String(data.value)}
+                {typeof data.value === "number" ? (
+                        data.value
+                      ) : data.name === "seatbelt" ? (
+                        data.value ? "Fastened" : "Unfastened"
+                      ) : data.name === "brake" ? (
+                        data.value ? "All good" : "Check"
+                      ) : (
+                        data.value ? "All good" : "Check"
+                      )}
                 </td>
                 <td className="py-3 px-4">
                   <span
