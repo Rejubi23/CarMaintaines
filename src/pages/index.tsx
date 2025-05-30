@@ -7,7 +7,7 @@ import SensorReading from "@/components/sensorReading";
 import SensorReports from "@/components/sensorReport";
 import SystemAlerts from "@/components/systemAlerts";
 import Topbar from "@/components/topbar";
-import { number } from "echarts";
+
 interface DataType{
 brake: boolean,
 brakeStatus: string,
@@ -22,6 +22,18 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<"dashboard" | "reports">("dashboard");
   const [error, setError] = useState<string | null>(null);
   const [data2, setData] = useState<DataType[]>([]);
+  const [onClick, setOnClick] = useState<boolean>(false);
+  const [loading, setLoading] = useState(true);
+
+
+  const checkClicked =()=>{
+    if(onClick){
+      setOnClick(!onClick)
+    }
+    else{
+      setOnClick(!onClick)
+    }
+  }
 
   useEffect(() => {
     const interval = setInterval(async () => {
@@ -31,13 +43,16 @@ export default function Home() {
   
         const json = await res.json();
         const newItem = json.data;
+        
   
         // Add only if data is different from the last item
+        
         setData((prev) => {
           const lastItem = prev[prev.length - 1];
           const isDifferent = JSON.stringify(lastItem) !== JSON.stringify(newItem);
           return isDifferent ? [...prev, newItem] : prev;
         });
+        setLoading(false)
   
       } catch (err: any) {
         setError(err.message || "Unknown error");
@@ -51,20 +66,32 @@ export default function Home() {
 
 
   return (
-   <div className="bg-[#fff]">
-      <Topbar data={data2}/>
-      {/* <Navbar activeTab={activeTab} setActiveTab={setActiveTab}/>
-      {activeTab === "reports" && (
-        <SensorReports generateData={generateRandomData} />
-      )} */}
+    <>
+    {/* Loading Overlay */}
+    {loading && (
+      <div className="fixed inset-0 bg-white z-[9999] flex items-center justify-center">
+        <div className="loader"></div>
+      </div>
+    )}
 
-      {/* {activeTab === "dashboard" && ( */}
+    {/* Main Layout */}
+    <div className="bg-[#fff]">
+      <Topbar data={data2} clicked={checkClicked} />
+      <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
+
+      {activeTab === "reports" && <SensorReports data={data2} />}
+
+      {activeTab === "dashboard" && (
+        <div>
           <SensorReading data={data2} />
-          <SystemAlerts data={data2}/>
-          <RecentSensor data={data2}/>
-      {/* )} */}
-      <Footer/>
-   </div>
+          {onClick && <SystemAlerts data={data2} />}
+          <RecentSensor data={data2} />
+        </div>
+      )}
+
+      <Footer />
+    </div>
+  </>
   );
 };
 
